@@ -3,7 +3,7 @@ description: "lego is all you need"
 #publish_to: 'none'
 repository: https://github.com/flutter-lego/firebase_vertexai_lego
 
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -21,7 +21,7 @@ dependencies:
   flutter_screenutil:
   bot_toast:
   firebase_core:
-  firebase_vertexai: ^0.2.2+2
+  firebase_vertexai:
 
 dev_dependencies:
   flutter_test:

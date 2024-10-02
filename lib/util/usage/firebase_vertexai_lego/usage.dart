@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +8,7 @@ import '../../_/shared_params/firebase_vertexai_lego/_.dart';
 
 String _noteName = "Note";
 
+/// Generate text from text-only input
 T _button00 = T("00", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 
@@ -20,6 +23,7 @@ T _button00 = T("00", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 });
 
+/// Generate text from text-only input
 T _button01 = T("01", onTap: (BuildContext context) async {
   ////////////////////////////////////////
   // Provide a prompt that contains text
@@ -31,50 +35,175 @@ T _button01 = T("01", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 });
 
+/// Generate text from text and a single image
 T _button02 = T("02", onTap: (BuildContext context) async {
   ////////////////////////////////////////
+  // Provide a text prompt to include with the image
+  final prompt = TextPart("What's in the picture?");
+  // Prepare images for input
+  // final image = await File('image0.jpg').readAsBytes();
+  // final imagePart = DataPart('image/jpeg', image);
 
+  final image =
+      await rootBundle.load('assets/lego/firebase_vertexai_lego/winter.webp');
+  final imageBytes = image.buffer.asUint8List();
+  final imagePart = DataPart('image/jpeg', imageBytes);
+
+  // To stream generated text output, call generateContentStream with the text and image
+  final response = vertexAIModel.generateContentStream([
+    Content.multi([prompt, imagePart])
+  ]);
+  await for (final chunk in response) {
+    print(chunk.text);
+  }
   ////////////////////////////////////////
 });
 
+/// Generate text from text and a single image
 T _button03 = T("03", onTap: (BuildContext context) async {
   ////////////////////////////////////////
+  // Provide a text prompt to include with the image
+  final prompt = TextPart("What's in the picture?");
+  // Prepare images for input
+  // final image = await File('image0.jpg').readAsBytes();
+  // final imagePart = DataPart('image/jpeg', image);
 
+  final image =
+      await rootBundle.load('assets/lego/firebase_vertexai_lego/winter.webp');
+  final imageBytes = image.buffer.asUint8List();
+  final imagePart = DataPart('image/jpeg', imageBytes);
+
+  // To generate text output, call generateContent with the text and image
+  final response = await vertexAIModel.generateContent([
+    Content.multi([prompt, imagePart])
+  ]);
+  print(response.text);
   ////////////////////////////////////////
 });
 
+/// Generate text from text and multiple images
 T _button04 = T("04", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 
+  // Load both images from assets
+  final imagesData = await Future.wait([
+    rootBundle.load('assets/lego/firebase_vertexai_lego/winter.webp'),
+    rootBundle.load('assets/lego/firebase_vertexai_lego/want0.webp'),
+  ]);
+
+  // Convert ByteData to Uint8List for each image with null checks
+  final firstImage = imagesData[0].buffer.asUint8List();
+  final secondImage = imagesData[1].buffer.asUint8List();
+
+  // Provide a text prompt to include with the images
+  final prompt = TextPart("What's different between these pictures?");
+
+  // Prepare images for input
+  final imageParts = [
+    DataPart('image/jpeg', firstImage),
+    DataPart('image/jpeg', secondImage),
+  ];
+
+  // To stream generated text output, call generateContentStream with the text and images
+  final response = vertexAIModel.generateContentStream([
+    Content.multi([prompt, ...imageParts])
+  ]);
+  await for (final chunk in response) {
+    print(chunk.text);
+  }
+
   ////////////////////////////////////////
 });
 
+/// Generate text from text and multiple images
 T _button05 = T("05", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 
+  // Load both images from assets
+  final imagesData = await Future.wait([
+    rootBundle.load('assets/lego/firebase_vertexai_lego/winter.webp'),
+    rootBundle.load('assets/lego/firebase_vertexai_lego/want0.webp'),
+  ]);
+
+  // Convert ByteData to Uint8List for each image with null checks
+  final firstImage = imagesData[0].buffer.asUint8List();
+  final secondImage = imagesData[1].buffer.asUint8List();
+
+  // Provide a text prompt to include with the images
+  final prompt = TextPart("What's different between these pictures?");
+
+  // Prepare images for input
+  final imageParts = [
+    DataPart('image/jpeg', firstImage),
+    DataPart('image/jpeg', secondImage),
+  ];
+
+  // To generate text output, call generateContent with the text and images
+  final response = await vertexAIModel.generateContent([
+    Content.multi([prompt, ...imageParts])
+  ]);
+
+  print(response.text);
+
   ////////////////////////////////////////
 });
 
+/// Generate text from text and a video
 T _button06 = T("06", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 
+  // Provide a text prompt to include with the video
+  final prompt = TextPart("What's in the video?");
+
+  // Prepare video for input
+  final video = await File('video0.mp4').readAsBytes();
+
+  // Provide the video as `Data` with the appropriate mimetype
+  final videoPart = DataPart('video/mp4', video);
+
+  // To stream generated text output, call generateContentStream with the text and image
+  final response = await vertexAIModel.generateContentStream([
+    Content.multi([prompt, videoPart])
+  ]);
+  await for (final chunk in response) {
+    print(chunk.text);
+  }
+
   ////////////////////////////////////////
 });
+
 
 T _button07 = T("07", onTap: (BuildContext context) async {
-  ////////////////////////////////////////
+  ///////////////////////////////////////
+
 
   ////////////////////////////////////////
 });
 
+/// Count tokens and billable characters (text-only input)
 T _button08 = T("08", onTap: (BuildContext context) async {
   ////////////////////////////////////////
 
+  final tokenCount = await vertexAIModel.countTokens([Content.text("Write a story about a magic backpack.")]);
+  print('Token count: ${tokenCount.totalTokens}, billable characters: ${tokenCount.totalBillableCharacters}');
+
   ////////////////////////////////////////
 });
 
+/// Count tokens and billable characters (text and image input)
 T _button09 = T("09", onTap: (BuildContext context) async {
   ////////////////////////////////////////
+
+  final prompt = TextPart("What's in the picture?");
+  final image =
+  await rootBundle.load('assets/lego/firebase_vertexai_lego/winter.webp');
+  final imageBytes = image.buffer.asUint8List();
+  final imagePart = DataPart('image/jpeg', imageBytes);
+
+  final tokenCount = await vertexAIModel.countTokens([
+    Content.multi([prompt, imagePart])
+  ]);
+  print('Token count: ${tokenCount.totalTokens}, billable characters: ${tokenCount.totalBillableCharacters}');
 
   ////////////////////////////////////////
 });
